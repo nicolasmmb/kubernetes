@@ -1,0 +1,141 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: api-test-k3s
+  labels:
+    name: api-test-k3s
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  namespace: api-test-k3s
+  labels:
+    app: api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-deployment
+  template:
+    metadata:
+      labels:
+        app: api-deployment
+    spec:
+      containers:
+        - name: api-deployment
+          image: nicolasmmb/main-tests-deploy
+          imagePullPolicy: Always
+          resources:
+            # Maximum CPU and memory usage
+            limits:
+              cpu: 500m
+              memory: 32Mi
+            # Minimum CPU and memory usage
+            requests:
+              cpu: 250m
+              memory: 16Mi
+          ports:
+            - containerPort: 8001
+          # livenessProbe:
+          #   httpGet:
+          #     path: /health-check
+          #     port: 8000
+          #     scheme: HTTP
+          #   initialDelaySeconds: 10
+          #   timeoutSeconds: 10
+          #   periodSeconds: 12
+          #   successThreshold: 1
+          #   failureThreshold: 3
+          env:
+            - name: _OBJ_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: _OBJ_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: _POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: _POD_SERVICE_ACCOUNT
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.serviceAccountName
+            - name: _POD_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: _POD_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: _POD_PODUID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+      terminationGracePeriodSeconds: 20
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-test-service
+  namespace: api-test-k3s
+  labels:
+    app: api-test
+spec:
+  selector:
+    app: api-deployment
+  type: LoadBalancer
+  loadBalancerIP: 192.168.3.215
+  ports:
+    - name: http
+      port: 80
+      nodePort: 30080
+      protocol: TCP
+      targetPort: 8001
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-test-hpa
+  namespace: api-test-k3s
+  labels:
+    app: api-deployment
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-deployment
+
+  minReplicas: 1
+  maxReplicas: 32
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    # - type: Resource
+    #   resource:
+    #     name: memory
+    #     target:
+    #       type: Utilization
+    #       averageUtilization: 70
+
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 10
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 10
+        - type: Percent
+          value: 50
+          periodSeconds: 10

@@ -1,0 +1,65 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: foo-svc
+  namespace: echo-apps
+spec:
+  selector:
+    app: foo
+  ports:
+    - protocol: TCP
+      port: 8001
+---
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: foo-ingress
+  namespace: echo-apps
+  annotations:
+    kubernetes.io/ingress.class: nginx-manager
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    # accept redirects
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+spec:
+  rules:
+    # - host: api.server.local
+    - http:
+        paths:
+          - path: /backend/envs(/|$)(.*)
+            # pathType: ImplementationSpecific
+            pathType: Prefix
+            backend:
+              service:
+                name: foo-svc
+                port:
+                  number: 8001
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: foo-deployment
+  namespace: echo-apps
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: foo
+  template:
+    metadata:
+      labels:
+        app: foo
+    spec:
+      containers:
+        - name: foo
+          image: nicolasmmb/main-tests-deploy
+          ports:
+            - containerPort: 8001
+              protocol: TCP
+          resources:
+            requests:
+              memory: "16Mi"
+              cpu: "32m"
+            limits:
+              memory: "32Mi"
+              cpu: "750m"
