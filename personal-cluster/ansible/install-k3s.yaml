@@ -81,16 +81,16 @@
         K3S_NODE_NAME=NODE-{{inventory_hostname.upper()}} \
         sh -
 
-# - name: REBOOT ALL
-#   hosts: servers
-#   tasks:
-#     - name: -> REBOOT
-#       shell: |
-#         reboot
-#       become: yes
-#       become_user: root
-#       register: reboot
-#       ignore_errors: no
+- name: REBOOT ALL
+  hosts: servers
+  tasks:
+    - name: -> REBOOT
+      shell: |
+        reboot
+      become: yes
+      become_user: root
+      register: reboot
+      ignore_errors: no
 
 
 # ansible-playbook -i hosts.yaml playbook.yaml 

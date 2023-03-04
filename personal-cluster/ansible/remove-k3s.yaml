@@ -1,0 +1,53 @@
+- name: UNISTALLING K3S - MASTER
+  hosts: KUBE-MASTER
+  tasks:
+    - name: -> MASTER - KILL K3S 
+      shell: |
+        k3s-killall.sh 
+      become: yes
+      become_user: root
+      register: k3s_killall
+      ignore_errors: yes
+
+    - name: -> MASTER - REMOVE K3S
+      shell: |
+        k3s-uninstall.sh
+      become: yes
+      become_user: root
+      register: k3s_uninstall
+      ignore_errors: yes
+
+
+- name: UNISTALLING K3S - NODES
+  hosts: KUBE-NODES
+  tasks:
+    - name: -> NODES - KILL K3S 
+      shell: |
+        k3s-killall.sh 
+      become: yes
+      become_user: root
+      register: k3s_killall
+      ignore_errors: yes
+
+    - name: -> NODES - REMOVE K3S
+      shell: |
+        k3s-agent-uninstall.sh
+      become: yes
+      become_user: root
+      register: k3s_uninstall
+      ignore_errors: yes
+
+    
+- name: REBOOT ALL
+  hosts: servers
+  tasks:
+    - name: -> REBOOT
+      shell: |
+        reboot
+      become: yes
+      become_user: root
+      register: reboot
+      ignore_errors: no
+
+
+# ansible-playbook -i hosts.yaml remove-k3s.yaml 
