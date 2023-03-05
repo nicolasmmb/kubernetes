@@ -3,7 +3,9 @@ from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 
-app = FastAPI()
+app = FastAPI(
+    root_path="/backend/envs/",
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
