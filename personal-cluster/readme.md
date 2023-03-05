@@ -21,3 +21,30 @@ ansible-playbook -i hosts.yaml install-k3s.yaml
 ```bash
 ansible-playbook -i hosts.yaml reboot.yaml
 ```
+
+# Step 4:
+## Configure MetalLB
+  - Access MetalLB directory
+```bash
+  ./run.sh
+```
+
+# Step 5:
+## Configure Ingress
+  - Standard Ingress Class: `kubernetes.io/ingress.class: nginx-manager`
+  - Access Ingress directory
+  - Run and wait
+```bash
+  ./run.sh
+```
+
+# Step 6 - Optional:
+# Deploy the Demo Application
+  - Access Deploy directory
+```bash
+  ./run.sh
+```
+
+# Step 7:
+## Configure Metrics Server
+  - Access Metrics directory
