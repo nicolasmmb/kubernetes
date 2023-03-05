@@ -1,45 +1,5 @@
-- name: UNISTALLING K3S - MASTER
-  hosts: KUBE-MASTER
-  tasks:
-    - name: -> MASTER - KILL K3S 
-      shell: |
-        k3s-killall.sh 
-      become: yes
-      become_user: root
-      register: k3s_killall
-      ignore_errors: yes
-
-    - name: -> MASTER - REMOVE K3S
-      shell: |
-        k3s-uninstall.sh
-      become: yes
-      become_user: root
-      register: k3s_uninstall
-      ignore_errors: yes
-
-
-- name: UNISTALLING K3S - NODES
-  hosts: KUBE-NODES
-  tasks:
-    - name: -> NODES - KILL K3S 
-      shell: |
-        k3s-killall.sh 
-      become: yes
-      become_user: root
-      register: k3s_killall
-      ignore_errors: yes
-
-    - name: -> NODES - REMOVE K3S
-      shell: |
-        k3s-agent-uninstall.sh
-      become: yes
-      become_user: root
-      register: k3s_uninstall
-      ignore_errors: yes
-
-    
 - name: INSTALLING K3S - MASTER
-  hosts: KUBE-MASTER
+  hosts: MASTER
   tasks:
     - name: -> MASTER - INSTALL K3S
       shell: |
@@ -48,14 +8,14 @@
         --disable servicelb,traefik,metrics-server \
         --token master-password \
         --node-taint CriticalAddonsOnly=true:NoExecute \
-        --bind-address 192.168.3.100 \
+        --bind-address 192.168.3.102 \
         --node-name MASTER
       become: yes
       become_user: root
       register: k3s_install
       ignore_errors: no
 
-    - name: -> MASTER - INSTALL K3S - GET TOKEN
+    - name: -> MASTER - GET TOKEN
       shell: |
         cat /etc/rancher/k3s/k3s.yaml
       become: yes
@@ -63,34 +23,22 @@
       register: k3s_token
       ignore_errors: no
 
-    - name: -> MASTER - INSTALL K3S - SAVE TOKEN
+    - name: -> MASTER - SAVE TOKEN
       delegate_to: localhost
       copy:
         content: "{{ k3s_token.stdout }}"
-        dest: /Users/nicolas.mmb/.kube/k3s_token.yaml
+        dest: /Users/nicolas.mmb/.kube/token.yaml
       ignore_errors: no
     
-- name: INSTALLING K3S - NODES
-  hosts: KUBE-NODES
+- name: NODES - INSTALLING K3S
+  hosts: NODES
   tasks:
     - name: -> NODE - INSTALL K3S
       shell: |
         curl -sfL https://get.k3s.io | \
-        K3S_URL=https://192.168.3.100:6443 \
+        K3S_URL=https://192.168.3.102:6443 \
         K3S_TOKEN=master-password \
         K3S_NODE_NAME=NODE-{{inventory_hostname.upper()}} \
         sh -
-
-- name: REBOOT ALL
-  hosts: servers
-  tasks:
-    - name: -> REBOOT
-      shell: |
-        reboot
-      become: yes
-      become_user: root
-      register: reboot
-      ignore_errors: no
-
 
 # ansible-playbook -i hosts.yaml playbook.yaml 

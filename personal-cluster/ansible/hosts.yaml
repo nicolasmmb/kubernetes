@@ -1,43 +1,26 @@
-KUBE-MASTER:
+MASTER:
   hosts:
-    kube-rp3:
+    rp3:
       ansible_host: 192.168.3.102
       ansible_user: root
       ansible_ssh_pass: dietpi
       ansible_become: yes
 
-KUBE-NODES:
+NODES:
   hosts:
-    kube-rp4:
+    rp4:
       ansible_host: 192.168.3.100
       ansible_user: root
       ansible_ssh_pass: dietpi
       ansible_become: yes
-    mini-pc:
+
+    minipc:
       ansible_host: 192.168.3.101
       ansible_user: root
       ansible_ssh_pass: root
       ansible_become: yes
 
-servers:
+SERVERS:
   children:
-    KUBE-MASTER:
-    KUBE-NODES:
-      
-# servers:
-#   hosts:
-#     mini-pc:
-#       ansible_host: 192.168.3.101
-#       ansible_user: root
-#       ansible_ssh_pass: root
-#       ansible_become: yes
-#     kube-rp4:
-#       ansible_host: 192.168.3.100
-#       ansible_user: root
-#       ansible_ssh_pass: dietpi
-#       ansible_become: yes
-#     kube-rp3:
-#       ansible_host: 192.168.3.102
-#       ansible_user: root
-#       ansible_ssh_pass: dietpi
-#       ansible_become: yes
+    MASTER:
+    NODES:
