@@ -5,6 +5,15 @@ metadata:
   labels:
     name: dev-apps
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dev-apps-config
+  namespace: dev-apps
+data:
+  ROOT_PATH: "/backend/envs/"
+  VERSION: "0.0.1"
+---
 kind: Service
 apiVersion: v1
 metadata:
@@ -47,7 +56,7 @@ metadata:
   name: foo-deployment
   namespace: dev-apps
 spec:
-  replicas: 4
+  replicas: 3
   selector:
     matchLabels:
       app: foo
@@ -70,3 +79,14 @@ spec:
             limits:
               memory: "32Mi"
               cpu: "1"
+          env:
+            - name: ROOT_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-apps-config
+                  key: ROOT_PATH
+            - name: VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-apps-config
+                  key: VERSION

@@ -1,11 +1,20 @@
+from typing import Final
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
+import os
 
+ROOT_PATH: Final[str] = os.environ.get("ROOT_PATH", "/")
+VERSION: Final[str] = os.environ.get("VERSION", "X")
 
 app = FastAPI(
-    root_path="/backend/envs/",
+    root_path=ROOT_PATH,
+    version=VERSION,
+    swagger_ui_parameters={
+        "defaultModelsExpandDepth": -1,
+    },
 )
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,23 +24,8 @@ app.add_middleware(
 )
 
 
-@app.get("/timer", tags=["Timer"])
-async def read_timer(interval: int = 5):
-    import time
-
-    time.sleep(interval)
-    return {"interval": interval}
-
-
-@app.get("/error", tags=["Error"])
-async def read_error():
-    raise ValueError("This is an error")
-
-
-@app.get("/all_env_vars", tags=["ENVs"])
-async def read_all_env_vars():
-    import os
-
+@app.get("/all", tags=["ENVs"])
+async def read_all_envs():
     values = {k: v for k, v in os.environ.items()}
     return {k: values[k] for k in sorted(values)}
 
