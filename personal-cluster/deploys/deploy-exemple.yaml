@@ -56,7 +56,7 @@ metadata:
   name: foo-deployment
   namespace: dev-apps
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: foo
@@ -77,8 +77,8 @@ spec:
               memory: "16Mi"
               cpu: "32m"
             limits:
-              memory: "32Mi"
-              cpu: "1"
+              memory: "96Mi"
+              cpu: "128m"
           env:
             - name: ROOT_PATH
               valueFrom:
