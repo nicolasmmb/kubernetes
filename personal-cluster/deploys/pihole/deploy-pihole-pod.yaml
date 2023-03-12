@@ -2,7 +2,7 @@ kind: Pod
 apiVersion: v1
 metadata:
   namespace: internal-tools
-  name: pihole
+  name: pihole-pod
   labels:
     app: pihole
 spec:

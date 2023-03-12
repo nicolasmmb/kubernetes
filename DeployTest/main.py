@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 import os
+from uvicorn import run
 
 ROOT_PATH: Final[str] = os.environ.get("ROOT_PATH", "/")
 VERSION: Final[str] = os.environ.get("VERSION", "X")
@@ -38,3 +39,7 @@ async def read_health_check():
 @app.get("/", include_in_schema=False)
 async def redirect_docs():
     return RedirectResponse("/docs")
+
+
+if __name__ == "__main__":
+    run(app, host="0.0.0.0", port=8000)
