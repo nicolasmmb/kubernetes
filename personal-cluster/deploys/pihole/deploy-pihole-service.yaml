@@ -3,11 +3,9 @@ kind: Service
 metadata:
   namespace: internal-tools
   name: pihole-svc
-  labels:
-    app: pihole
 spec:
   selector:
-    app: pihole
+    name: pihole-pod
   ports:
     - name: dns-udp
       protocol: UDP

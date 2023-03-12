@@ -3,18 +3,16 @@ apiVersion: v1
 metadata:
   namespace: internal-tools
   name: pihole-pod
-  labels:
-    app: pihole
 spec:
   containers:
-    - name: pihole
+    - name: pihole-container
       image: pihole/pihole:latest
       resources:
         requests:
           memory: "64Mi"
           cpu: "64m"
         limits:
-          memory: "128Mi"
+          memory: "256Mi"
           cpu: "250m"
       volumeMounts:
         - name: pihole-pv-claim
