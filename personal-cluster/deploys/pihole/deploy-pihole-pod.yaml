@@ -61,4 +61,4 @@ spec:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                  - node-rp4
+                  - node-minipc
