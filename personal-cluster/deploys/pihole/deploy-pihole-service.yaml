@@ -5,7 +5,7 @@ metadata:
   name: pihole-svc
 spec:
   selector:
-    name: pihole-pod
+    name: pihole-dpl
   ports:
     - name: dns-udp
       protocol: UDP
